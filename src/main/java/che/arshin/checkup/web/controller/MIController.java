@@ -48,7 +48,7 @@ public class MIController {
     }
 
     @PostMapping()
-    public ResponseEntity<MIResponse> registerMI(MIRequest request){
+    public ResponseEntity<MIResponse> registerMI(@RequestBody MIRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 miMapper.from(
                         miService.createMI(
