@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDate;
 
 @Data
@@ -13,9 +14,9 @@ public class MIResponse {
     private Long id;
     private String model;
     private String serialNumber;
-    private LocalDate lastVerificationDate;
-    private LocalDate nextVerificationDate;
-    private String queryMIName;
-    private String queryMIDesignation;
-    private String queryMIModification;
+    private Instant verificationDate;
+    private Instant validDate;
+    private String miType;
+    private String modification;
+    private String miTitle;
 }

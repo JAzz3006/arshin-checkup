@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 public class MIRequest {
     private String model;
     private String serialNumber;
-    private String queryMIName;
-    private String queryMIDesignation;
-    private String queryMIModification;
+    private String miType;
+    private String modification;
+    private String miTitle;
 }

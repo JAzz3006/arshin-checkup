@@ -3,20 +3,21 @@ import che.arshin.checkup.client.ArshinClient;
 import che.arshin.checkup.client.dto.ArshinResponse;
 import che.arshin.checkup.entity.MeasuringInstrument;
 import che.arshin.checkup.exception.EntityNotFoundException;
-import che.arshin.checkup.exception.BadArshinResponseException;
 import che.arshin.checkup.mapper.MIMapper;
 import che.arshin.checkup.repository.MIRepository;
 import che.arshin.checkup.utils.BeanUtils;
 import che.arshin.checkup.web.dto.ArshinQuery;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
+import che.arshin.checkup.exception.BadArshinResponseException;
 import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MIService {
 
     private final MIRepository miRepository;
@@ -54,11 +55,16 @@ public class MIService {
         MeasuringInstrument mi = findMIById(id);
         ArshinQuery arshinQuery = miMapper.arshinQueryFrom(mi);
         ArshinResponse arshinResponse = arshinClient.getArshinResponse(arshinQuery);
+
         if (arshinResponse == null) throw new BadArshinResponseException("Cannot get GIS Arshin response");
-        if (arshinResponse.getResponse().getNumFound() == 1){
+
+        log.warn("NumFound = {}", arshinResponse.getResponse().getNumFound());
+
+        if (arshinResponse.getResponse().getNumFound() > 0){
+            //TODO make it not more than 3
             Instant verificationDate = arshinResponse.getResponse().getDocs().getFirst().getVerificationDate();
             Instant validDate = arshinResponse.getResponse().getDocs().getFirst().getValidDate();
-            if (validDate.isAfter(mi.getValidDate())){
+            if (mi.getValidDate() == null || validDate.isAfter(mi.getValidDate())){
                 mi.setVerificationDate(verificationDate);
                 mi.setValidDate(validDate);
             }
@@ -66,7 +72,6 @@ public class MIService {
         } else if (arshinResponse.getResponse().getNumFound() == 0) {
             throw new BadArshinResponseException("GIS Arshin response contains no response");
             //надо проверить каков ответ, если СИ не найдено
-        }
-        throw new BadArshinResponseException("GIS Arshin response contains more than one response");
+        } else throw new BadArshinResponseException("GIS Arshin response contains more than one response");
     }
 }
