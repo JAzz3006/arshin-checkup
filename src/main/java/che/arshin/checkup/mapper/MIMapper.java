@@ -1,5 +1,6 @@
 package che.arshin.checkup.mapper;
 import che.arshin.checkup.entity.MeasuringInstrument;
+import che.arshin.checkup.web.dto.ArshinQuery;
 import che.arshin.checkup.web.dto.MIListResponse;
 import che.arshin.checkup.web.dto.MIRequest;
 import che.arshin.checkup.web.dto.MIResponse;
@@ -11,6 +12,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MIMapper {
     MeasuringInstrument from(MIRequest request);
+    ArshinQuery arshinQueryFrom(MeasuringInstrument mi);
     MIResponse from(MeasuringInstrument mi);
     List<MIResponse> from(List<MeasuringInstrument> instruments);
     default MIListResponse from(Page<MeasuringInstrument> instrumentPage){

@@ -3,6 +3,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.Instant;
 import java.time.LocalDate;
 
 @Data
@@ -20,22 +22,22 @@ public class MeasuringInstrument {
     @Column(name = "model")
     private String model;
 
-    @Column(name = "serial_number")
+    @Column(name = "mi_number")
     private String serialNumber;
 
-    @Column(name = "last_verification_date")
-    private LocalDate lastVerificationDate;
+    @Column(name = "verification_date")
+    private Instant verificationDate;
 
-    @Column(name = "next_verification_date")
-    private LocalDate nextVerificationDate;
+    @Column(name = "valid_date")
+    private Instant validDate;
 
-    //TODO подумать над расширением перечня query_
-    @Column(name = "query_MI_name")
-    private String queryMIName;
+    //TODO подумать над расширением перечня query
+    @Column(name = "mi_mitype")
+    private String miType;
 
-    @Column(name = "query_MI_designation")
-    private String queryMIDesignation;
+    @Column(name = "mi_modification")
+    private String modification;
 
-    @Column(name = "query_MI_modification")
-    private String queryMIModification;
+    @Column(name = "mi_mititle")
+    private String miTitle;
 }

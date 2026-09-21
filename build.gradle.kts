@@ -21,6 +21,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
 	implementation("org.mapstruct:mapstruct:1.5.3.Final")
+	implementation("com.squareup.okhttp3:okhttp:4.12.0")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("org.postgresql:postgresql")

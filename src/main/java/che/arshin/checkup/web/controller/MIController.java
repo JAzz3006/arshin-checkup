@@ -78,4 +78,13 @@ public class MIController {
                 miMapper.from(currentMI)
         );
     }
+
+    @PostMapping("{id}/verify")
+    public ResponseEntity<MIResponse> checkVerificationById(@PathVariable Long id){
+        return ResponseEntity.ok(
+                miMapper.from(
+                        miService.checkVerificationById(id)
+                )
+        );
+    }
 }
