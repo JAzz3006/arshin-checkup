@@ -1,6 +1,7 @@
 package che.arshin.checkup.web.controller;
 import che.arshin.checkup.exception.BadArshinResponseException;
 import che.arshin.checkup.exception.EntityNotFoundException;
+import che.arshin.checkup.exception.ExcelParseException;
 import che.arshin.checkup.web.dto.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mapping.callback.ReactiveEntityCallbacks;
@@ -26,6 +27,14 @@ public class ExceptionController {
         log.warn(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(ExcelParseException.class)
+    public ResponseEntity<ErrorResponse> handleExcelParseException(ExcelParseException e){
+        log.warn(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(e.getMessage()));
     }
 }

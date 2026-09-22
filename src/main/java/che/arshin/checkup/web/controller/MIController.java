@@ -1,6 +1,7 @@
 package che.arshin.checkup.web.controller;
 import che.arshin.checkup.entity.MeasuringInstrument;
 import che.arshin.checkup.mapper.MIMapper;
+import che.arshin.checkup.preprocessing.excel.ExcelParser;
 import che.arshin.checkup.service.MIService;
 import che.arshin.checkup.web.dto.MIListResponse;
 import che.arshin.checkup.web.dto.MIRequest;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/mi")
@@ -20,6 +23,7 @@ public class MIController {
 
     private final MIMapper miMapper;
     private final MIService miService;
+    private final ExcelParser excelParser;
 
     @GetMapping("/{id}")
     public ResponseEntity<MIResponse> getMIById(@PathVariable Long id){
@@ -86,5 +90,15 @@ public class MIController {
                         miService.checkVerificationById(id)
                 )
         );
+    }
+
+    @PostMapping("/fill-in-massive")
+    public ResponseEntity<Void> massiveFillIn(){
+        try{
+            miService.fillDB(excelParser.getRequests());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

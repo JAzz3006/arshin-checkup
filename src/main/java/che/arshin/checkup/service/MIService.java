@@ -4,16 +4,21 @@ import che.arshin.checkup.client.dto.ArshinResponse;
 import che.arshin.checkup.entity.MeasuringInstrument;
 import che.arshin.checkup.exception.EntityNotFoundException;
 import che.arshin.checkup.mapper.MIMapper;
+import che.arshin.checkup.preprocessing.excel.ExcelParser;
 import che.arshin.checkup.repository.MIRepository;
 import che.arshin.checkup.utils.BeanUtils;
 import che.arshin.checkup.web.dto.ArshinQuery;
+import che.arshin.checkup.web.dto.MIRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import che.arshin.checkup.exception.BadArshinResponseException;
+
+import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -73,5 +78,11 @@ public class MIService {
             throw new BadArshinResponseException("GIS Arshin response contains no response");
             //надо проверить каков ответ, если СИ не найдено
         } else throw new BadArshinResponseException("GIS Arshin response contains more than one response");
+    }
+
+    public void fillDB(List<MIRequest> requests){
+        for (MIRequest request : requests){
+            createMI(miMapper.from(request));
+        }
     }
 }

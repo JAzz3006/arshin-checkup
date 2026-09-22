@@ -1,6 +1,8 @@
 app:
   integration:
     base-url: https://fgis.gost.ru/fundmetrology/cm/xcdb/vri/select
+  xls-location:
+    xlsx/mtn.xlsx
 spring:
   application:
     name: arshin-checkup
