@@ -38,4 +38,10 @@ public class MeasuringInstrument {
 
     @Column(name = "mi_mititle")
     private String miTitle;
+
+    @Column(name = "results_count")
+    private Integer resultsCount;
+
+    @Column(name = "auto_checkup")
+    private Boolean autoCheckUp;
 }

@@ -4,7 +4,6 @@ import che.arshin.checkup.client.dto.ArshinResponse;
 import che.arshin.checkup.entity.MeasuringInstrument;
 import che.arshin.checkup.exception.EntityNotFoundException;
 import che.arshin.checkup.mapper.MIMapper;
-import che.arshin.checkup.preprocessing.excel.ExcelParser;
 import che.arshin.checkup.repository.MIRepository;
 import che.arshin.checkup.utils.BeanUtils;
 import che.arshin.checkup.web.dto.ArshinQuery;
@@ -37,11 +36,20 @@ public class MIService {
                 );
     }
 
+    public List<MeasuringInstrument> findAllMI(){
+        return miRepository.findAll();
+    }
+
     public Page<MeasuringInstrument> findAllMI(Pageable pageable){
         return miRepository.findAll(pageable);
     }
 
+    public Page<MeasuringInstrument> findAllMIVerificationNeeded(Pageable pageable){
+        return miRepository.findAllNeedsVerification(pageable, Instant.now());
+    }
+
     public MeasuringInstrument createMI(MeasuringInstrument mi){
+        mi.setAutoCheckUp(true);
         //TODO подумать над автоматическим запросом к ГИС при создании СИ
         return miRepository.save(mi);
     }
@@ -58,6 +66,8 @@ public class MIService {
 
     public MeasuringInstrument checkVerificationById(Long id){
         MeasuringInstrument mi = findMIById(id);
+        if (!mi.getAutoCheckUp()) return mi;
+
         ArshinQuery arshinQuery = miMapper.arshinQueryFrom(mi);
         ArshinResponse arshinResponse = arshinClient.getArshinResponse(arshinQuery);
 
@@ -69,9 +79,12 @@ public class MIService {
             //TODO make it not more than 3
             Instant verificationDate = arshinResponse.getResponse().getDocs().getFirst().getVerificationDate();
             Instant validDate = arshinResponse.getResponse().getDocs().getFirst().getValidDate();
+            Integer resultsCount = arshinResponse.getResponse().getNumFound();
+            log.warn("ResultsCount = {}", resultsCount);
             if (mi.getValidDate() == null || validDate.isAfter(mi.getValidDate())){
                 mi.setVerificationDate(verificationDate);
                 mi.setValidDate(validDate);
+                mi.setResultsCount(resultsCount);
             }
             return miRepository.save(mi);
         } else if (arshinResponse.getResponse().getNumFound() == 0) {

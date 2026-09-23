@@ -12,4 +12,5 @@ public class MIRequest {
     private String miType;
     private String modification;
     private String miTitle;
+    private Boolean autoCheckUp;
 }

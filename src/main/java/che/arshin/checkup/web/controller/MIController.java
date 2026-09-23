@@ -13,7 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 
 @RequiredArgsConstructor
@@ -47,6 +46,23 @@ public class MIController {
         return ResponseEntity.ok(
                 miMapper.from(
                         miService.findAllMI(pageable)
+                )
+        );
+    }
+
+    @GetMapping("/v-needed")
+    public ResponseEntity<MIListResponse> gelAllMIVerificationNeeded(
+            @RequestParam int page,
+            @RequestParam int size
+    ){
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by("id").ascending()
+        );
+        return ResponseEntity.ok(
+                miMapper.from(
+                        miService.findAllMIVerificationNeeded(pageable)
                 )
         );
     }

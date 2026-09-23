@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Preprocessing test</title>
+</head>
+<body>
+
+<form action="/api/mi/preprocess/all" method="post">
+    <button type="submit">Preprocess all MI</button>
+</form>
+<form action="/api/mi/preprocess/auto-check" method="post">
+    <button type="submit">Set automated GIS checking</button>
+</form>
+
+<h2>Проверка поверки СИ</h2>
+
+<label for="miId">ID средства измерения:</label>
+<input type="number" id="miId" min="1">
+
+<button type="button" onclick="verifyMI()">
+    Проверить поверку
+</button>
+
+<div id="result"></div>
+
+<script>
+    async function verifyMI() {
+
+        const id = document.getElementById("miId").value;
+        const result = document.getElementById("result");
+
+        if (!id) {
+            result.textContent = "Введите ID средства измерения";
+            return;
+        }
+
+        result.textContent = "Проверяем...";
+
+        try {
+            const response = await fetch(`/api/mi/${id}/verify`, {
+                method: "POST"
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                result.textContent = data.message ?? "Ошибка проверки";
+                return;
+            }
+
+            result.innerHTML = `
+                <p><b>Модель:</b> ${data.model ?? "-"}</p>
+                <p><b>Серийный номер:</b> ${data.serialNumber ?? "-"}</p>
+                <p><b>Дата поверки:</b> ${data.verificationDate ?? "-"}</p>
+                <p><b>Действительна до:</b> ${data.validDate ?? "-"}</p>
+            `;
+
+        } catch (error) {
+            result.textContent = "Ошибка обращения к серверу";
+        }
+    }
+</script>
+</body>
+</html>

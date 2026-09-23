@@ -5,7 +5,6 @@ import che.arshin.checkup.web.dto.MIListResponse;
 import che.arshin.checkup.web.dto.MIRequest;
 import che.arshin.checkup.web.dto.MIResponse;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.data.domain.Page;
 import java.util.List;

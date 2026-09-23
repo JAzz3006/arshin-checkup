@@ -19,4 +19,6 @@ public class MIResponse {
     private String miType;
     private String modification;
     private String miTitle;
+    private Boolean autoCheckUp;
+    private Integer resultsCount;
 }
