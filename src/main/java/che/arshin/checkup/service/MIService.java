@@ -40,6 +40,10 @@ public class MIService {
         return miRepository.findAll();
     }
 
+    public List<MeasuringInstrument> findAllMIInSerialNumberRange(Long min, Long max){
+        return miRepository.findAllNumberRange(min, max);
+    }
+
     public Page<MeasuringInstrument> findAllMI(Pageable pageable){
         return miRepository.findAll(pageable);
     }

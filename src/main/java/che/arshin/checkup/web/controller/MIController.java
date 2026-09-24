@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -29,6 +30,18 @@ public class MIController {
         return ResponseEntity.ok(
                 miMapper.from(
                         miService.findMIById(id)
+                )
+        );
+    }
+
+    @GetMapping("/in-number-range")
+    public ResponseEntity<List<MIResponse>> gelAllMIInSerialNubberRange(
+            @RequestParam Long min,
+            @RequestParam Long max
+    ){
+        return ResponseEntity.ok(
+                miMapper.from(
+                        miService.findAllMIInSerialNumberRange(min, max)
                 )
         );
     }

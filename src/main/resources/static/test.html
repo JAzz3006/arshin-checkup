@@ -3,6 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Preprocessing test</title>
+    <style>
+        table {
+            margin: 20px auto;
+        }
+
+        th, td {
+            padding: 6px 12px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 
@@ -23,6 +33,103 @@
 </button>
 
 <div id="result"></div>
+
+<h2>Вывод СИ по диапазону серийных номеров</h2>
+
+<label for="minSN">МИН серийный номер СИ:</label>
+<input type="number" id="minSN" min="1">
+<label for="maxSN">МАКС серийный номер СИ:</label>
+<input type="number" id="maxSN" min="1">
+
+<button type="button" onclick="getByRange()">
+    СИ по диапазону с/н
+</button>
+
+<div id="resultByRange"></div>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Модель</th>
+        <th>Серийный номер</th>
+        <th>Дата поверки</th>
+        <th>Действительна до</th>
+    </tr>
+    </thead>
+
+    <tbody id="miTableBody">
+    </tbody>
+</table>
+
+<script>
+    async function getByRange() {
+
+        console.log("!!! НОВАЯ getByRange !!!");
+
+        const min = document.getElementById("minSN").value;
+        const max = document.getElementById("maxSN").value;
+        const result = document.getElementById("resultByRange");
+        const tableBody = document.getElementById("miTableBody");
+
+        if (!min) {
+            result.textContent = "Введите нижнюю границу диапазона с/н средства измерения";
+            return;
+        }
+        if (!max) {
+            result.textContent = "Введите верхнюю границу диапазона с/н средства измерения";
+            return;
+        }
+
+        result.textContent = "Ожидайте...";
+
+        try {
+            const response = await fetch(`/api/mi/in-number-range?min=${min}&max=${max}`, {
+                method: "GET"
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                result.textContent = data.message ?? "Ответ содержит ошибку";
+                return;
+            }
+            console.log("До очистки:", tableBody.children.length);
+            tableBody.innerHTML = "";
+            console.log("После очистки:", tableBody.children.length);
+
+            result.textContent = `Найдено записей: ${data.length}`;
+
+            data.forEach(mi => {
+                const row = document.createElement("tr");
+
+                const idCell = document.createElement("td");
+                idCell.textContent = mi.id ?? "-";
+                row.appendChild(idCell);
+
+                const modelCell = document.createElement("td");
+                modelCell.textContent = mi.model ?? "-";
+                row.appendChild(modelCell);
+
+                const numberCell = document.createElement("td");
+                numberCell.textContent = mi.serialNumber ?? "-";
+                row.appendChild(numberCell);
+
+                const verificationCell = document.createElement("td");
+                verificationCell.textContent = mi.verificationDate ?? "-";
+                row.appendChild(verificationCell);
+
+                const validCell = document.createElement("td");
+                validCell.textContent = mi.validDate ?? "-";
+                row.appendChild(validCell);
+
+                tableBody.appendChild(row);
+            });
+
+        } catch (error) {
+            result.textContent = "Ошибка обращения к серверу";
+        }
+    }
+</script>
 
 <script>
     async function verifyMI() {
@@ -61,5 +168,7 @@
         }
     }
 </script>
+
+
 </body>
 </html>
