@@ -79,11 +79,10 @@ public class MIService {
 
         log.warn("NumFound = {}", arshinResponse.getResponse().getNumFound());
 
-        if (arshinResponse.getResponse().getNumFound() > 0){
-            //TODO make it not more than 3
+        Integer resultsCount = arshinResponse.getResponse().getNumFound();
+        if (resultsCount > 0 && resultsCount <= 3){
             Instant verificationDate = arshinResponse.getResponse().getDocs().getFirst().getVerificationDate();
             Instant validDate = arshinResponse.getResponse().getDocs().getFirst().getValidDate();
-            Integer resultsCount = arshinResponse.getResponse().getNumFound();
             log.warn("ResultsCount = {}", resultsCount);
             if (mi.getValidDate() == null || validDate.isAfter(mi.getValidDate())){
                 mi.setVerificationDate(verificationDate);
@@ -94,7 +93,7 @@ public class MIService {
         } else if (arshinResponse.getResponse().getNumFound() == 0) {
             throw new BadArshinResponseException("GIS Arshin response contains no response");
             //надо проверить каков ответ, если СИ не найдено
-        } else throw new BadArshinResponseException("GIS Arshin response contains more than one response");
+        } else throw new BadArshinResponseException("GIS Arshin response contains more than 3 documents");
     }
 
     public void fillDB(List<MIRequest> requests){

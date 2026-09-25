@@ -1,0 +1,45 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+h2 {
+    margin-bottom: 2px;
+    margin-left: 10px;
+    padding: 0;
+    line-height: 1;
+}
+
+p {
+    margin-top: 2px;
+    margin-left: 10px;
+    margin-bottom: 5px;
+    padding: 0;
+    line-height: 1;
+}
+
+table {
+            margin: 20px auto;
+        }
+
+th, td {
+            padding: 6px 12px;
+            text-align: center;
+        }
+
+#result-unverified {
+    margin-bottom: 15px;
+}
+
+.subtitle {
+    text-align: center;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.button-group button {
+    width: 180px;
+}

@@ -3,6 +3,7 @@ import che.arshin.checkup.entity.MeasuringInstrument;
 import che.arshin.checkup.mapper.MIMapper;
 import che.arshin.checkup.preprocessing.excel.ExcelParser;
 import che.arshin.checkup.service.MIService;
+import che.arshin.checkup.web.dto.MIListRequest;
 import che.arshin.checkup.web.dto.MIListResponse;
 import che.arshin.checkup.web.dto.MIRequest;
 import che.arshin.checkup.web.dto.MIResponse;
@@ -64,9 +65,9 @@ public class MIController {
     }
 
     @GetMapping("/v-needed")
-    public ResponseEntity<MIListResponse> gelAllMIVerificationNeeded(
-            @RequestParam int page,
-            @RequestParam int size
+    public ResponseEntity<MIListResponse> getAllMIVerificationNeeded(
+            @RequestParam (defaultValue = "${app.pagination.default-page-number}") int page,
+            @RequestParam (defaultValue = "${app.pagination.default-page-size}") int size
     ){
         Pageable pageable = PageRequest.of(
                 page,
@@ -112,8 +113,23 @@ public class MIController {
         );
     }
 
-    @PostMapping("{id}/verify")
+    @PostMapping("/{id}/verify")
     public ResponseEntity<MIResponse> checkVerificationById(@PathVariable Long id){
+        return ResponseEntity.ok(
+                miMapper.from(
+                        miService.checkVerificationById(id)
+                )
+        );
+    }
+
+    @PostMapping("/verify-group")
+    public ResponseEntity<String> checkVerificationByIds(@RequestBody MIListRequest request){
+        String report = "";
+        for (Long id : request.getIds()){
+            MeasuringInstrument mi = miService.checkVerificationById(id);
+        }
+
+
         return ResponseEntity.ok(
                 miMapper.from(
                         miService.checkVerificationById(id)

@@ -3,6 +3,9 @@ app:
     base-url: https://fgis.gost.ru/fundmetrology/cm/xcdb/vri/select
   xls-location:
     xlsx/mtn.xlsx
+  pagination:
+    default-page-number: 0
+    default-page-size: 20
 spring:
   application:
     name: arshin-checkup

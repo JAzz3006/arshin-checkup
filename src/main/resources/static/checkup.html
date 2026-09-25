@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Arshin Checkup</title>
+
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+<h2>ГИС АРШИН CHECKUP</h2>
+<p>автоматическая проверка актуальности поверки СИ</p>
+
+<div class="subtitle" id="result-unverified"></div>
+<div class="button-group">
+    <button type="button" onclick="checkSelectedMI()">
+        Проверить выделенные
+    </button>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>
+            <input type="checkbox" id="select-all">
+        </th>
+        <th>ID</th>
+        <th>Модель</th>
+        <th>Серийный номер</th>
+        <th>Дата поверки</th>
+        <th>Действительна до</th>
+        <th>Юр. лицо</th>
+        <th>Площадка</th>
+        <th>Населенный пункт</th>
+        <th>Адрес</th>
+    </tr>
+    </thead>
+
+    <tbody id="mi-table-body">
+    </tbody>
+</table>
+
+<script src="js/checkup.js"></script>
+</body>
+
+</html>
