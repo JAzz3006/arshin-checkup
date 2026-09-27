@@ -1,80 +1,81 @@
-    async function getAllMIVerificationNeeded() {
+async function getAllMIVerificationNeeded() {
 
-        const result = document.getElementById("result-unverified");
-        const tableBody = document.getElementById("mi-table-body");
+    const result = document.getElementById("result-unverified");
+    const tableBody = document.getElementById("mi-table-body");
 
-             result.textContent = "Ожидайте...";
+    result.textContent = "Ожидайте...";
 
-        try {
-            const response = await fetch(`/api/mi/v-needed`, {
-                method: "GET"
-            });
+    try {
+         const response = await fetch(`/api/mi/v-needed`, {
+             method: "GET"
+         });
 
-            const data = await response.json();
+         const data = await response.json();
 
-            if (!response.ok) {
-                result.textContent = data.message ?? "Ответ содержит ошибку";
-                return;
-            }
+         if (!response.ok) {
+             result.textContent = data.message ?? "Ответ содержит ошибку";
+             return;
+         }
 
-            tableBody.innerHTML = "";
+         tableBody.innerHTML = "";
 
-            result.textContent = `Найдено записей: ${data.totalElements}`;
+         result.textContent = `Найдено записей: ${data.totalElements}`;
 
-            data.miResponses    .forEach(mi => {
-                const row = document.createElement("tr");
+         data.miResponses.forEach(mi => {
+             const row = document.createElement("tr");
 
-                const boxCell = document.createElement("td");
-                    const checkbox = document.createElement("input");
-                    checkbox.type = "checkbox";
-                    checkbox.value = mi.id;
-                    boxCell.appendChild(checkbox)
-                row.appendChild(boxCell);
+             const boxCell = document.createElement("td");
+                 const checkbox = document.createElement("input");
+                 checkbox.type = "checkbox";
+                 checkbox.value = mi.id;
+                 boxCell.appendChild(checkbox)
+             row.appendChild(boxCell);
 
-                const idCell = document.createElement("td");
-                idCell.textContent = mi.id ?? "-";
-                row.appendChild(idCell);
+             const idCell = document.createElement("td");
+             idCell.textContent = mi.id ?? "-";
+             row.appendChild(idCell);
 
-                const modelCell = document.createElement("td");
-                modelCell.textContent = mi.model ?? "-";
-                row.appendChild(modelCell);
+             const modelCell = document.createElement("td");
+             modelCell.textContent = mi.model ?? "-";
+             row.appendChild(modelCell);
 
-                const numberCell = document.createElement("td");
-                numberCell.textContent = mi.serialNumber ?? "-";
-                row.appendChild(numberCell);
+             const numberCell = document.createElement("td");
+             numberCell.textContent = mi.serialNumber ?? "-";
+             row.appendChild(numberCell);
 
-                const verificationCell = document.createElement("td");
-                verificationCell.textContent = mi.verificationDate ?? "-";
-                row.appendChild(verificationCell);
+             const verificationCell = document.createElement("td");
+             verificationCell.textContent = formatDate(mi.verificationDate) ?? "-";
+             row.appendChild(verificationCell);
 
-                const validCell = document.createElement("td");
-                validCell.textContent = mi.validDate ?? "-";
-                row.appendChild(validCell);
+             const validCell = document.createElement("td");
+             validCell.textContent = formatDate(mi.validDate) ?? "-";
+             row.appendChild(validCell);
 
-                const organizationCell = document.createElement("td");
-                organizationCell.textContent = mi.organization ?? "-";
-                row.appendChild(organizationCell);
+             const organizationCell = document.createElement("td");
+             organizationCell.textContent = mi.organization ?? "-";
+             row.appendChild(organizationCell);
 
-                const siteCell = document.createElement("td");
-                siteCell.textContent = mi.site ?? "-";
-                row.appendChild(siteCell);
+             const siteCell = document.createElement("td");
+             siteCell.textContent = mi.site ?? "-";
+             row.appendChild(siteCell);
 
-                const settlementCell = document.createElement("td");
-                settlementCell.textContent = mi.settlement ?? "-";
-                row.appendChild(settlementCell);
+             const settlementCell = document.createElement("td");
+             settlementCell.textContent = mi.settlement ?? "-";
+             row.appendChild(settlementCell);
 
-                const addressCell = document.createElement("td");
-                addressCell.textContent = mi.address ?? "-";
-                row.appendChild(addressCell);
+             const addressCell = document.createElement("td");
+             addressCell.textContent = mi.address ?? "-";
+             row.appendChild(addressCell);
 
-                tableBody.appendChild(row);
-            });
+             tableBody.appendChild(row);
+         });
 
-        } catch (error) {
-            result.textContent = "Ошибка обращения к серверу";
-        }
+    } catch (error) {
+        result.textContent = "Ошибка обращения к серверу";
     }
-function checkSelectedMI() {
+}
+
+async function checkSelectedMI() {
 
     const selectedCheckboxes = document.querySelectorAll(
         '#mi-table-body input[type="checkbox"]:checked'
@@ -87,8 +88,34 @@ function checkSelectedMI() {
         alert("Выберите средства измерения для проверки");
         return;
     }
-
     console.log(selectedIds);
+
+    const response = await fetch(`/api/mi/verify-group`,{
+        method: "POST",
+        headers:{
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            ids: selectedIds
+        })
+    });
+
+    const data = await response.json();
+    console.log(data)
+
+    sessionStorage.setItem(
+        "verificationResults",
+        JSON.stringify(data)
+    );
+
+    window.location.href = "/results.html";
+}
+
+function formatDate(dateString) {
+    if (!dateString) {
+        return "-";
+    }
+return new Date(dateString).toLocaleDateString("ru-RU");
 }
 
 document.addEventListener("DOMContentLoaded", () => {

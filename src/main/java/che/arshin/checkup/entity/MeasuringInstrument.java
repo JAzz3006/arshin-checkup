@@ -44,4 +44,7 @@ public class MeasuringInstrument {
 
     @Column(name = "auto_checkup")
     private Boolean autoCheckUp;
+
+    @Column(name = "applicability")
+    private Boolean applicability;
 }

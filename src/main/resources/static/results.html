@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Arshin Checkup - результаты запроса ГИС Аршин</title>
+
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+<h2>ГИС АРШИН CHECKUP</h2>
+<p>автоматическая проверка актуальности поверки СИ</p>
+<div class="subtitle">
+    <a href="/checkup.html">&lt;&lt;назад</a>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Модель</th>
+        <th>Серийный номер</th>
+        <th>Статус</th>
+        <th>Сообщение</th>
+        <th>Действительно до (до проверки)</th>
+        <th>Действительна до (после проверки)</th>
+        <th>Кол-во найденных документов</th>
+        <th>Юр. лицо</th>
+        <th>Площадка</th>
+        <th>Населенный пункт</th>
+        <th>Адрес</th>
+    </tr>
+    </thead>
+
+    <tbody id="report-table-body">
+    </tbody>
+</table>
+<div class="subtitle" id="stats"></div>
+<script src="js/results.js"></script>
+</body>
+</html>

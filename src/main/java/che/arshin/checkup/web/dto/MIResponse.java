@@ -21,4 +21,5 @@ public class MIResponse {
     private String miTitle;
     private Boolean autoCheckUp;
     private Integer resultsCount;
+    private Boolean applicability;
 }

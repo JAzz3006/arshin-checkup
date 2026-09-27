@@ -6,6 +6,9 @@ app:
   pagination:
     default-page-number: 0
     default-page-size: 20
+  settings:
+    max-arshin-results-count: 3
+    request-delay-ms: 1000
 spring:
   application:
     name: arshin-checkup

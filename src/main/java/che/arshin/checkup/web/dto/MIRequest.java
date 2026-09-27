@@ -13,4 +13,5 @@ public class MIRequest {
     private String modification;
     private String miTitle;
     private Boolean autoCheckUp;
+    private Boolean applicability;
 }

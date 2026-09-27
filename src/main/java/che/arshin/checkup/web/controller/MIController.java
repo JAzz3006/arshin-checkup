@@ -1,12 +1,10 @@
 package che.arshin.checkup.web.controller;
 import che.arshin.checkup.entity.MeasuringInstrument;
+import che.arshin.checkup.exception.EntityNotFoundException;
 import che.arshin.checkup.mapper.MIMapper;
 import che.arshin.checkup.preprocessing.excel.ExcelParser;
 import che.arshin.checkup.service.MIService;
-import che.arshin.checkup.web.dto.MIListRequest;
-import che.arshin.checkup.web.dto.MIListResponse;
-import che.arshin.checkup.web.dto.MIRequest;
-import che.arshin.checkup.web.dto.MIResponse;
+import che.arshin.checkup.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -114,26 +112,16 @@ public class MIController {
     }
 
     @PostMapping("/{id}/verify")
-    public ResponseEntity<MIResponse> checkVerificationById(@PathVariable Long id){
+    public ResponseEntity<VerificationResult> checkVerificationById(@PathVariable Long id){
         return ResponseEntity.ok(
-                miMapper.from(
-                        miService.checkVerificationById(id)
-                )
+                miService.checkVerificationById(id)
         );
     }
 
     @PostMapping("/verify-group")
-    public ResponseEntity<String> checkVerificationByIds(@RequestBody MIListRequest request){
-        String report = "";
-        for (Long id : request.getIds()){
-            MeasuringInstrument mi = miService.checkVerificationById(id);
-        }
-
-
+    public ResponseEntity<VerificationListResult> checkVerificationByIds(@RequestBody MIListRequest request){
         return ResponseEntity.ok(
-                miMapper.from(
-                        miService.checkVerificationById(id)
-                )
+                miService.checkVerificationByMultipleIds(request.getIds())
         );
     }
 

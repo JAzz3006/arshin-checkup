@@ -1,5 +1,6 @@
 package che.arshin.checkup.client;
 import che.arshin.checkup.client.dto.ArshinResponse;
+import che.arshin.checkup.exception.BadArshinResponseException;
 import che.arshin.checkup.web.dto.ArshinQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -30,14 +31,6 @@ public class ArshinClient {
         });
     }
 
-    //https://fgis.gost.ru/fundmetrology/cm/xcdb/vri/select?
-    // fq=mi.mitype:*%D0%BC%D0%B5%D1%82%D1%80%D0%B0%D0%BD*&
-    // fq=mi.modification:*150TA2*&
-    // fq=mi.number:*6183862*
-    // &q=*&fl=vri_id,org_title,mi.mitnumber,mi.mititle,mi.mitype,mi.modification,mi.number,
-    // verification_date,valid_date,applicability,result_docnum,sticker_num
-    // &sort=verification_date+desc,org_title+asc&rows=20&start=0
-
     private HttpUrl buildUrl(ArshinQuery arshinQuery) {
         HttpUrl url = Objects.requireNonNull(HttpUrl.parse(baseUrl))
                 .newBuilder()
@@ -60,7 +53,7 @@ public class ArshinClient {
     private <T> T processResponse (Request request, TypeReference<T> typeReference) {
         try(Response response = httpClient.newCall(request).execute()){
             if (!response.isSuccessful()){
-                throw new RuntimeException("Unexpected response code " + response);
+                throw new BadArshinResponseException("Unexpected response code " + response);
             }
 
             ResponseBody responseBody = response.body();
@@ -69,10 +62,10 @@ public class ArshinClient {
                 String stringBody = responseBody.string();
                 return objectMapper.readValue(stringBody, typeReference);
             }else {
-                throw new RuntimeException("ResponseBody is empty!");
+                throw new BadArshinResponseException("ResponseBody is empty!");
             }
         }catch (IOException e){
-            throw new RuntimeException("Error processing Arshin response", e);
+            throw new BadArshinResponseException("Error processing Arshin response");
         }
     }
 }

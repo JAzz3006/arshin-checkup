@@ -30,6 +30,10 @@ th, td {
     margin-bottom: 15px;
 }
 
+#stats {
+    white-space: pre-line;
+}
+
 .subtitle {
     text-align: center;
 }
