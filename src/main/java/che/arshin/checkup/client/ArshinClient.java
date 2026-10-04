@@ -43,7 +43,7 @@ public class ArshinClient {
                                 "mi.mitype,mi.modification,mi.number," +
                                 "verification_date,valid_date,applicability," +
                                 "result_docnum,sticker_num")
-                .addQueryParameter("sort", "verification_date desc,org_title asc")
+                .addQueryParameter("sort", "verification_date desc,org_title asc") //it is crucial for further logic to maintain this sort type - the latest validation must come first
                 .addQueryParameter("rows", "20")
                 .addQueryParameter("start", "0")
                 .build();

@@ -29,7 +29,7 @@ public class MeasuringInstrument {
     @Column(name = "valid_date")
     private Instant validDate;
 
-    //TODO подумать над расширением перечня query
+    //TODO подумать надо ли сюда статус
     @Column(name = "mi_mitype")
     private String miType;
 

@@ -1,8 +1,5 @@
 package che.arshin.checkup.web.controller;
-import che.arshin.checkup.exception.BadArshinResponseException;
-import che.arshin.checkup.exception.EntityNotFoundException;
-import che.arshin.checkup.exception.ExcelParseException;
-import che.arshin.checkup.exception.NoMeasuringInstrumentException;
+import che.arshin.checkup.exception.*;
 import che.arshin.checkup.web.dto.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mapping.callback.ReactiveEntityCallbacks;
@@ -14,6 +11,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 @Slf4j
 public class ExceptionController {
+
+    @ExceptionHandler(MultipleMatchedStrategiesException.class)
+    public ResponseEntity<ErrorResponse> handleMultipleMatchedStrategiesException(MultipleMatchedStrategiesException e){
+        log.warn(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(StrategyNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleStrategyNotFoundException(StrategyNotFoundException e){
+        log.warn(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_CONTENT)
+                .body(new ErrorResponse(e.getMessage()));
+    }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException (EntityNotFoundException e){

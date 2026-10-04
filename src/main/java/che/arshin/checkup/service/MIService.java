@@ -1,5 +1,6 @@
 package che.arshin.checkup.service;
 import che.arshin.checkup.client.ArshinClient;
+import che.arshin.checkup.client.dto.ArshinDocument;
 import che.arshin.checkup.client.dto.ArshinResponse;
 import che.arshin.checkup.entity.MeasuringInstrument;
 import che.arshin.checkup.exception.EntityNotFoundException;
@@ -94,76 +95,28 @@ public class MIService {
         if (arshinResponse == null){
             throw new BadArshinResponseException ("ГИС Аршин не предоставил ответ");
         }
-//TODO: здесь очень спорный порядок проверок. Обдумать тщательно!
-        log.info("resultCount = {}", arshinResponse.getResponse().getNumFound());
 
         int resultCount = arshinResponse.getResponse().getNumFound();
-        boolean miUsable = arshinResponse.getResponse().getDocs().getFirst().isApplicability();
-        Instant verificationDate = arshinResponse.getResponse().getDocs().getFirst().getVerificationDate();
-        Instant validDate = arshinResponse.getResponse().getDocs().getFirst().getValidDate();
+        log.info("resultCount = {}", resultCount);
 
-        if (resultCount > 0 && resultCount <= maxArshinResultsCount){
-            log.info("ResultsCount = {}", resultCount);
-            if (mi.getValidDate() == null || validDate.isAfter(mi.getValidDate())) {
-                mi.setVerificationDate(verificationDate);
-                mi.setValidDate(validDate);
-                mi.setResultsCount(resultCount);
-                mi.setApplicability(miUsable);
-                MeasuringInstrument savedMI = miRepository.save(mi);
-                return VerificationResult.builder()
-                        .id(id)
-                        .model(mi.getModel())
-                        .serialNumber(mi.getSerialNumber())
-                        .status(VerificationStatus.UPDATED)
-                        .message("Даты поверки СИ обновлены")
-                        .previousValidDate(previousValidDate)
-                        .arshinValidDate(savedMI.getValidDate())
-                        .resultCount(resultCount)
-                        .applicability(savedMI.getApplicability())
-                        .build();
-            }else if (!miUsable) {
-                mi.setVerificationDate(verificationDate);
-                mi.setValidDate(validDate);
-                mi.setResultsCount(resultCount);
-                mi.setApplicability(miUsable);
-                MeasuringInstrument savedMI = miRepository.save(mi);
-                return VerificationResult.builder()
-                        .id(id)
-                        .model(mi.getModel())
-                        .serialNumber(mi.getSerialNumber())
-                        .status(VerificationStatus.UNUSABLE)
-                        .message("СИ признано непригодным")
-                        .previousValidDate(previousValidDate)
-                        .arshinValidDate(savedMI.getValidDate())
-                        .resultCount(resultCount)
-                        .applicability(savedMI.getApplicability())
-                        .build();
-            }else{
-                mi.setResultsCount(resultCount);
-                MeasuringInstrument savedMI = miRepository.save(mi);
-                return VerificationResult.builder()
-                        .id(id)
-                        .model(mi.getModel())
-                        .serialNumber(mi.getSerialNumber())
-                        .status(VerificationStatus.NOT_UPDATED)
-                        .message("Даты поверки СИ не обновлены - ГИС не содержит актуальных дат")
-                        .previousValidDate(previousValidDate)
-                        .resultCount(resultCount)
-                        .applicability(miUsable)
-                        .build();
-            }
-        }else if (arshinResponse.getResponse().getNumFound() == 0) {
+        List<ArshinDocument> docs = arshinResponse.getResponse().getDocs();
+
+        if (resultCount == 0 || docs == null || docs.isEmpty()){
             return VerificationResult.builder()
                     .id(id)
                     .model(mi.getModel())
                     .serialNumber(mi.getSerialNumber())
                     .status(VerificationStatus.NO_RESULT)
-                    .message(String.format("В ГИС Аршин нет результата по СИ с id='%d'", id))
+                    .message(String.format("В ГИС Аршин нет данных о поверке СИ с id='%d'", id))
                     .previousValidDate(previousValidDate)
                     .resultCount(resultCount)
-                    .applicability(miUsable)
+                    .applicability(mi.getApplicability())
                     .build();
-        }else{
+        }
+
+        ArshinDocument document = docs.getFirst(); // Arshin response is sorted by verification_date desc, so the first document contains the latest verification
+
+        if (resultCount > maxArshinResultsCount){
             return VerificationResult.builder()
                     .id(id)
                     .model(mi.getModel())
@@ -175,7 +128,61 @@ public class MIService {
                     )
                     .previousValidDate(previousValidDate)
                     .resultCount(resultCount)
-                    .applicability(miUsable)
+                    .applicability(mi.getApplicability())
+                    .build();
+        }
+
+        boolean miUsable = document.isApplicability();
+        Instant verificationDate = document.getVerificationDate();
+        Instant validDate = document.getValidDate();
+
+        if(!miUsable) {
+            mi.setVerificationDate(verificationDate);
+            mi.setValidDate(validDate);
+            mi.setResultsCount(resultCount);
+            mi.setApplicability(false);
+            MeasuringInstrument savedMI = miRepository.save(mi);
+            return VerificationResult.builder()
+                    .id(id)
+                    .model(mi.getModel())
+                    .serialNumber(mi.getSerialNumber())
+                    .status(VerificationStatus.UNUSABLE)
+                    .message("СИ признано непригодным")
+                    .previousValidDate(previousValidDate)
+                    .arshinValidDate(savedMI.getValidDate())
+                    .resultCount(resultCount)
+                    .applicability(savedMI.getApplicability())
+                    .build();
+        }else if(mi.getValidDate() == null || validDate.isAfter(mi.getValidDate())) {
+            mi.setVerificationDate(verificationDate);
+            mi.setValidDate(validDate);
+            mi.setResultsCount(resultCount);
+            mi.setApplicability(true);
+            MeasuringInstrument savedMI = miRepository.save(mi);
+            return VerificationResult.builder()
+                    .id(id)
+                    .model(mi.getModel())
+                    .serialNumber(mi.getSerialNumber())
+                    .status(VerificationStatus.UPDATED)
+                    .message("Даты поверки СИ обновлены")
+                    .previousValidDate(previousValidDate)
+                    .arshinValidDate(savedMI.getValidDate())
+                    .resultCount(resultCount)
+                    .applicability(savedMI.getApplicability())
+                    .build();
+        }else{
+            mi.setResultsCount(resultCount);
+            mi.setApplicability(true);
+            miRepository.save(mi);
+            return VerificationResult.builder()
+                    .id(id)
+                    .model(mi.getModel())
+                    .serialNumber(mi.getSerialNumber())
+                    .status(VerificationStatus.NOT_UPDATED)
+                    .message("Даты поверки СИ не обновлены - ГИС не содержит актуальных дат")
+                    .previousValidDate(previousValidDate)
+                    .resultCount(resultCount)
+                    .applicability(true)
                     .build();
         }
     }
