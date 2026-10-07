@@ -15,11 +15,11 @@ public class ProcessingController {
     private final ProcessingService processingService;
     private final MIMapper miMapper;
 
-    @PostMapping("/all")
-    public ResponseEntity<String> preprocessAllMI(){
-        processingService.preProcessAll();
-        return ResponseEntity.ok("DONE!"); //TODO set something more meaningful
-    }
+//    @PostMapping("/all")
+//    public ResponseEntity<String> preprocessAllMI(){
+//        processingService.preProcessAll();
+//        return ResponseEntity.ok("DONE!"); //TODO set something more meaningful
+//    }
 
     @PostMapping("/auto-check")
     public ResponseEntity<String> analyzeAutoCheck(){
