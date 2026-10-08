@@ -24,6 +24,9 @@ public class ExcelParser {
     @Value("${app.xls-location}")
     String pathAsSting;
 
+    @Value("${app.parse.first-data-row}")
+    int firstDataRow;
+
     public List<MIRequest> getRequests() throws IOException{
 
         Resource resource = new ClassPathResource(pathAsSting);
@@ -43,6 +46,12 @@ public class ExcelParser {
         int modelColumn = -1;
         try(Workbook workbook = new XSSFWorkbook(inputStream)){
             Sheet sheet = workbook.getSheetAt(0);
+            log.info("Sheet name ='{}', min row N={}, max row N={}, physical max row ={}",
+                    sheet.getSheetName(),
+                    sheet.getFirstRowNum(),
+                    sheet.getLastRowNum(),
+                    sheet.getPhysicalNumberOfRows()
+            );
             Row headerRow = sheet.getRow(2);
             for (Cell cell : headerRow){
                 if (cell.getStringCellValue().trim().toLowerCase(Locale.ROOT).equals("Серийный номер".toLowerCase(Locale.ROOT))){
@@ -62,8 +71,12 @@ public class ExcelParser {
                 );
             }
 
-            for (int i =3; i <= sheet.getLastRowNum(); i++){
+            for (int i = firstDataRow; i <= sheet.getPhysicalNumberOfRows(); i++){
                 Row row = sheet.getRow(i);
+                if (row == null){
+                    log.info("Строка '{}' отсутстует", i);
+                    continue;
+                }
                 String serialNumber = row
                         .getCell(serialNumberColumn)
                         .getStringCellValue();

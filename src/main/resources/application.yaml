@@ -1,8 +1,9 @@
 app:
   integration:
     base-url: https://fgis.gost.ru/fundmetrology/cm/xcdb/vri/select
-  xls-location:
-    xlsx/mtn.xlsx
+  xls-location: xlsx/allMI.xlsx
+  parse:
+    first-data-row: 3
   pagination:
     default-page-number: 0
     default-page-size: 20

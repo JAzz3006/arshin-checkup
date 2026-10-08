@@ -6,8 +6,13 @@ import che.arshin.checkup.mapper.MIMapper;
 import che.arshin.checkup.preprocessing.strategy.PreProcessingStrategy;
 import che.arshin.checkup.service.MIService;
 import che.arshin.checkup.web.dto.MIRequest;
+import che.arshin.checkup.web.dto.PreProcessResult;
+import che.arshin.checkup.web.dto.PreProcessStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,6 +46,21 @@ public class ProcessingService {
         miService.updateMI(mi.getId(), miMapper.from(request));
     }
 
+    public void preProcessAll(){
+        List<PreProcessResult> results = new ArrayList<>();
+        List<MeasuringInstrument> mis = miService.findAllMI();
+        for (MeasuringInstrument mi : mis) {
+            try {
+                preProcessOne(mi);
+                results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.PROCESSED, "OK"));
+            } catch (StrategyNotFoundException e) {
+                results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.NO_STRATEGY_FOUND, e.getMessage()));
+            } catch (MultipleMatchedStrategiesException e) {
+                results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.MULTIPLE_STRATEGIES_FOUND, e.getMessage()));
+            }
+        }
+    }
+
     public void analyzeAutoCheckability(){
         List<MeasuringInstrument> mis = miService.findAllMI();
         MIRequest request = new MIRequest();
@@ -57,5 +77,21 @@ public class ProcessingService {
                 miService.updateMI(mi.getId(), miMapper.from(request));
             }
         }
+    }
+
+    private PreProcessResult buildResult(
+            Long id,
+            String model,
+            String serialNumber,
+            PreProcessStatus status,
+            String message){
+        return PreProcessResult.builder()
+                .id(id)
+                .model(model)
+                .serialNumber(serialNumber)
+                .status(status)
+                .message(message)
+                .preProcessTime(Instant.now())
+                .build();
     }
 }

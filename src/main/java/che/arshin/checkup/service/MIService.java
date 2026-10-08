@@ -230,7 +230,11 @@ public class MIService {
 
     public void fillDB(List<MIRequest> requests){
         for (MIRequest request : requests){
+            log.info("СИ '{}' номер '{}'", request.getModel(), request.getSerialNumber());
             createMI(miMapper.from(request));
         }
+//        requests.stream() //тестовый вариант
+//                .limit(100)
+//                .forEach(r -> log.info("СИ '{}' номер '{}'", r.getModel(), r.getSerialNumber()));
     }
 }
