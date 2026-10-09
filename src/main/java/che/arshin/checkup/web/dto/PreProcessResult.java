@@ -1,4 +1,5 @@
 package che.arshin.checkup.web.dto;
+import che.arshin.checkup.preprocessing.service.PreProcessStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

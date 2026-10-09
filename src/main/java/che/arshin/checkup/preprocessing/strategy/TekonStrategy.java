@@ -1,11 +1,11 @@
 package che.arshin.checkup.preprocessing.strategy;
 import che.arshin.checkup.entity.MeasuringInstrument;
 import che.arshin.checkup.web.dto.MIRequest;
-import che.arshin.checkup.web.dto.MIResponse;
-
+import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.regex.Pattern;
 
+@Component
 public class TekonStrategy implements PreProcessingStrategy{
 
     private static final List<Pattern> METRAN_PATTERN = List.of(

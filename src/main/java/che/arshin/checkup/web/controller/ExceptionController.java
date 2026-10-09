@@ -59,4 +59,17 @@ public class ExceptionController {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(e.getMessage()));
     }
+
+    @ExceptionHandler(ReportWritingException.class)
+    public ResponseEntity<ErrorResponse> handleReportWritingException(
+            ReportWritingException e
+    ) {
+        log.error("Ошибка формирования отчёта", e);
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(
+                        "Не удалось сохранить отчёт препроцессинга"
+                ));
+    }
 }

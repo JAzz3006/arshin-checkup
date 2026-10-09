@@ -1,4 +1,5 @@
 package che.arshin.checkup.preprocessing.strategy;
+
 import che.arshin.checkup.entity.MeasuringInstrument;
 import che.arshin.checkup.exception.NoMeasuringInstrumentException;
 import che.arshin.checkup.web.dto.MIRequest;
@@ -7,16 +8,16 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @Component
-public class MetranStrategy1 implements PreProcessingStrategy{
+public class TPTDashStrategy implements PreProcessingStrategy{
 
-    private static final List<Pattern> METRAN_PATTERN = List.of(
-            Pattern.compile("метран", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE),
-            Pattern.compile("metran", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE)
+    private static final List<Pattern> TPT_DASH_PATTERN = List.of(
+            Pattern.compile("ТПТ-", Pattern.UNICODE_CASE)
     );
+
     @Override
     public boolean supports(MeasuringInstrument mi) {
         if (mi.getModel() == null || mi.getModel().isBlank()) return false;
-        return METRAN_PATTERN.stream()
+        return TPT_DASH_PATTERN.stream()
                 .anyMatch(p -> p.matcher(mi.getModel()).find());
     }
 
@@ -24,17 +25,17 @@ public class MetranStrategy1 implements PreProcessingStrategy{
     public MIRequest process(MeasuringInstrument mi) {
         if (mi == null) throw new NoMeasuringInstrumentException("СИ не передано");
         MIRequest request = new MIRequest();
-        request.setMiType("метран");
+        request.setMiType("ТПТ");
         String model = mi.getModel();
         int start = model.indexOf('-') + 1;
 
         int end = start;
-        while (end < model.length() && Character.isDigit(model.charAt(end))){
+        while (end < model.length() && !Character.isWhitespace(model.charAt(end))){
             end++;
         }
         String modification = model.substring(start, end);
 
-        if (!modification.equals("")){
+        if (!modification.isBlank()){
             request.setModification(modification);
         }else request.setModification(null);
 

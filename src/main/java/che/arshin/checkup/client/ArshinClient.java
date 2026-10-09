@@ -4,6 +4,7 @@ import che.arshin.checkup.exception.BadArshinResponseException;
 import che.arshin.checkup.web.dto.ArshinQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ArshinClient {
 
     private final OkHttpClient httpClient;
@@ -32,21 +34,41 @@ public class ArshinClient {
     }
 
     private HttpUrl buildUrl(ArshinQuery arshinQuery) {
-        HttpUrl url = Objects.requireNonNull(HttpUrl.parse(baseUrl))
-                .newBuilder()
-                .addQueryParameter("fq", "mi.mitype:*" + arshinQuery.getMiType() + "*")
-                .addQueryParameter("fq", "mi.modification:*" +arshinQuery.getModification() + "*")
-                .addQueryParameter("fq", "mi.number:" + arshinQuery.getSerialNumber())
-                .addQueryParameter("q", "*")
-                .addQueryParameter("fl",
-                        "vri_id,org_title,mi.mitnumber,mi.mititle," +
-                                "mi.mitype,mi.modification,mi.number," +
-                                "verification_date,valid_date,applicability," +
-                                "result_docnum,sticker_num")
-                .addQueryParameter("sort", "verification_date desc,org_title asc") //it is crucial for further logic to maintain this sort type - the latest validation must come first
-                .addQueryParameter("rows", "20")
-                .addQueryParameter("start", "0")
-                .build();
+        HttpUrl url = null;
+        if (arshinQuery.getModification() == null || arshinQuery.getModification().isBlank()){
+            url = Objects.requireNonNull(HttpUrl.parse(baseUrl))
+                    .newBuilder()
+                    .addQueryParameter("fq", "mi.mitype:*" + arshinQuery.getMiType() + "*")
+                    //.addQueryParameter("fq", "mi.modification:*" +arshinQuery.getModification() + "*")
+                    .addQueryParameter("fq", "mi.number:" + arshinQuery.getSerialNumber())
+                    .addQueryParameter("q", "*")
+                    .addQueryParameter("fl",
+                            "vri_id,org_title,mi.mitnumber,mi.mititle," +
+                                    "mi.mitype,mi.modification,mi.number," +
+                                    "verification_date,valid_date,applicability," +
+                                    "result_docnum,sticker_num")
+                    .addQueryParameter("sort", "verification_date desc,org_title asc") //it is crucial for further logic to maintain this sort type - the latest validation must come first
+                    .addQueryParameter("rows", "20")
+                    .addQueryParameter("start", "0")
+                    .build();
+        }else{
+            url = Objects.requireNonNull(HttpUrl.parse(baseUrl))
+                    .newBuilder()
+                    .addQueryParameter("fq", "mi.mitype:*" + arshinQuery.getMiType() + "*")
+                    //.addQueryParameter("fq", "mi.modification:*" +arshinQuery.getModification() + "*")
+                    .addQueryParameter("fq", "mi.number:" + arshinQuery.getSerialNumber())
+                    .addQueryParameter("q", "*")
+                    .addQueryParameter("fl",
+                            "vri_id,org_title,mi.mitnumber,mi.mititle," +
+                                    "mi.mitype,mi.modification,mi.number," +
+                                    "verification_date,valid_date,applicability," +
+                                    "result_docnum,sticker_num")
+                    .addQueryParameter("sort", "verification_date desc,org_title asc") //it is crucial for further logic to maintain this sort type - the latest validation must come first
+                    .addQueryParameter("rows", "20")
+                    .addQueryParameter("start", "0")
+                    .build();
+        }
+        log.info("Запрос: {}", url);
         return url;
     }
 

@@ -1,6 +1,5 @@
 package che.arshin.checkup.web.controller;
 import che.arshin.checkup.entity.MeasuringInstrument;
-import che.arshin.checkup.exception.EntityNotFoundException;
 import che.arshin.checkup.mapper.MIMapper;
 import che.arshin.checkup.preprocessing.excel.ExcelParser;
 import che.arshin.checkup.service.MIService;

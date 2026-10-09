@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Конфигурация</title>
+
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <h2>ГИС АРШИН CHECKUP</h2>
+    <p>автоматическая проверка актуальности поверки СИ</p>
+    <p class="config">конфигурация</p>
+    <div class="text-align-left">
+        <a href="checkup.html">&lt;&lt;назад</a>
+    </div>
+    <div class="button-group">
+        <button type="button" onclick="preProcessAll()">
+            Предварительная обработака всех СИ
+        </button>
+        <button type="button" onclick="loadFromXlsx()">
+            Загрузка тестовой БД из .xls
+        </button>
+    </div>
+    <div class="subtitle" id="result-preprocess"></div>
+    <table>
+        <thead>
+        <tr>
+            <th>Статус</th>
+            <th>Количество</th>
+        </tr>
+        </thead>
+
+        <tbody id="preprocess-summary-table-body">
+        </tbody>
+    </table>
+
+    <script src="js/config.js"></script>
+</body>
+
+</html>

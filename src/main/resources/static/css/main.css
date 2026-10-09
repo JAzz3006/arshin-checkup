@@ -38,6 +38,20 @@ th, td {
     text-align: center;
 }
 
+.text-align-left {
+    text-align: left;
+    margin-top: 2px;
+    margin-left: 10px;
+}
+
+.config {
+    text-align: left;
+    margin-top: 2px;
+    margin-left: 10px;
+    font-weight: bold;
+    font-size: 20px;
+}
+
 .button-group {
     display: flex;
     justify-content: center;
