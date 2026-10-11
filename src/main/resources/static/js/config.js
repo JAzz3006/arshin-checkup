@@ -42,7 +42,13 @@ async function preProcessAll(){
     }
 }
 
+let loading = false;
+
 async function loadFromXlsx(){
+    if (loading) return
+
+    loading = true;
+
     const result = document.getElementById("result-preprocess");
     const tableBody = document.getElementById("preprocess-summary-table-body");
 
@@ -54,10 +60,16 @@ async function loadFromXlsx(){
         method: "POST"
         });
 
-        result.textContent = "Создано... "
+        if(!response.ok){
+             throw new Error(`HTTP ${response.status}`);
+        }
+
+        result.textContent = "База данных заполнена "
 
     }catch(error){
         console.error(error);
         result.textContent = "Ошибка обращения к серверу";
+    }finally{
+        loading = false;
     }
 }

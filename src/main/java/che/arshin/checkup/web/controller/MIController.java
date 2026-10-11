@@ -5,6 +5,7 @@ import che.arshin.checkup.preprocessing.excel.ExcelParser;
 import che.arshin.checkup.service.MIService;
 import che.arshin.checkup.web.dto.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/mi")
@@ -22,6 +25,7 @@ public class MIController {
     private final MIMapper miMapper;
     private final MIService miService;
     private final ExcelParser excelParser;
+    private AtomicInteger callCount = new AtomicInteger(0);
 
     @GetMapping("/{id}")
     public ResponseEntity<MIResponse> getMIById(@PathVariable Long id){
@@ -125,12 +129,32 @@ public class MIController {
     }
 
     @PostMapping("/fill-in-massive")
-    public ResponseEntity<Void> massiveFillIn(){
-        try{
-            miService.fillDB(excelParser.getRequests());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public ResponseEntity<Void> massiveFillIn() throws IOException{
+
+        int callNumber = callCount.incrementAndGet();
+
+        log.warn("========== IMPORT CALL #{} START==========", callNumber);
+
+        List<MIRequest> requests = excelParser.getRequests();
+        log.warn("IMPORT CALL #{}, parsed {} requests", callNumber, requests.size());
+
+
+        miService.fillDB(requests);
+        log.warn("========== IMPORT CALL #{} FINISH==========", callNumber);
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/test-timeout")
+    public ResponseEntity<String> testTimeout()
+            throws InterruptedException {
+
+        log.warn("TIMEOUT TEST START");
+
+        Thread.sleep(90_000);
+
+        log.warn("TIMEOUT TEST FINISH");
+
+        return ResponseEntity.ok("OK");
     }
 }

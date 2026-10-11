@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -21,10 +20,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -76,17 +72,30 @@ public class ProcessingService {
         List<PreProcessResult> results = new ArrayList<>();
         List<MeasuringInstrument> mis = miService.findAllMI();
         for (MeasuringInstrument mi : mis) {
-            if (Boolean.FALSE.equals(mi.getApplicability())){
-                results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.NOT_APPLICABLE, "СИ непригодно"));
-                continue;
-            }
+
             if (mi.getModel() == null ||
                     mi.getModel().isBlank() ||
                     mi.getSerialNumber() == null ||
                     mi.getSerialNumber().isBlank()){
+                MIRequest request = new MIRequest(null,null,null,null,null,false, null);
+                miService.updateMI(mi.getId(), miMapper.from(request));
                 results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.NOT_AUTO_CHECKABLE, "Отсутствует модель или серийный номер"));
                 continue;
             }
+
+            if (mi.getModel().toLowerCase(Locale.ROOT).contains("акт") ||
+                    mi.getModel().toLowerCase(Locale.ROOT).contains("нет корректора")){
+                MIRequest request = new MIRequest(null,null,null,null,null,false, null);
+                miService.updateMI(mi.getId(), miMapper.from(request));
+                results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.NOT_MEASURING_INSTRUMENT, "Не является СИ"));
+                continue;
+            }
+
+            if (Boolean.FALSE.equals(mi.getApplicability())){ //TODO: для вывода СИ из состояния "непригодно" нужен отдельный метод
+                results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.NOT_APPLICABLE, "СИ непригодно"));
+                continue;
+            }
+
             try {
                 preProcessOne(mi);
                 results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.PROCESSED, "OK"));
@@ -145,24 +154,6 @@ public class ProcessingService {
         return "preprocess" + formatter.format(Instant.now()) + ".csv";
     }
 
-    public void analyzeAutoCheckability(){
-        List<MeasuringInstrument> mis = miService.findAllMI();
-        MIRequest request = new MIRequest();
-        for (MeasuringInstrument mi :mis){
-            if (mi.getModel() == null ||
-                    mi.getModel().isBlank() ||
-                    mi.getSerialNumber() == null ||
-                    mi.getSerialNumber().isBlank()||
-                    mi.getApplicability().equals(Boolean.FALSE)){
-                request.setAutoCheckUp(false);
-                miService.updateMI(mi.getId(), miMapper.from(request));
-            }else{
-                request.setAutoCheckUp(true);
-                miService.updateMI(mi.getId(), miMapper.from(request));
-            }
-        }
-    }
-
     private PreProcessResult buildResult(
             Long id,
             String model,
@@ -181,9 +172,7 @@ public class ProcessingService {
 
     private String csvValue(Object value) {
         if (value == null) return "";
-
         String text = value.toString();
-
         return "\"" + text.replace("\"", "\"\"") + "\"";
     }
 }

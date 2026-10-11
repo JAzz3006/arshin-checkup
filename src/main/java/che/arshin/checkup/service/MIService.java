@@ -4,6 +4,7 @@ import che.arshin.checkup.client.dto.ArshinDocument;
 import che.arshin.checkup.client.dto.ArshinResponse;
 import che.arshin.checkup.entity.MeasuringInstrument;
 import che.arshin.checkup.exception.EntityNotFoundException;
+import che.arshin.checkup.exception.ReportWritingException;
 import che.arshin.checkup.mapper.MIMapper;
 import che.arshin.checkup.repository.MIRepository;
 import che.arshin.checkup.utils.BeanUtils;
@@ -15,9 +16,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import che.arshin.checkup.exception.BadArshinResponseException;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +37,9 @@ public class MIService {
     private int maxArshinResultsCount;
     @Value("${app.settings.request-delay-ms}")
     private int requestDelay;
+    @Value("${app.reports.directory}")
+    private String reportsDirectory;
+
 
     private final MIRepository miRepository;
     private final ArshinClient arshinClient;
@@ -230,11 +242,49 @@ public class MIService {
 
     public void fillDB(List<MIRequest> requests){
         for (MIRequest request : requests){
-            log.info("СИ '{}' номер '{}'", request.getModel(), request.getSerialNumber());
+            //log.info("СИ '{}' номер '{}'", request.getModel(), request.getSerialNumber());
             createMI(miMapper.from(request));
         }
+        try{
+            fillInDBReportWriter(requests);
+        }catch (IOException e){
+            log.warn("Failed to create BD fill in report");
+            throw new ReportWritingException("Failed to create BD fill in report", e);
+        }
+
+
 //        requests.stream() //тестовый вариант
 //                .limit(100)
 //                .forEach(r -> log.info("СИ '{}' номер '{}'", r.getModel(), r.getSerialNumber()));
+    }
+
+    public Path fillInDBReportWriter(List<MIRequest> requests) throws IOException {
+        AtomicInteger ordinalNumber = new AtomicInteger(0);
+        Path reportsDir = Path.of(reportsDirectory);
+        Files.createDirectories(reportsDir);
+        Path filePath = reportsDir.resolve(generatePreProcessReportName());
+        try (BufferedWriter writer = Files.newBufferedWriter(
+                filePath,
+                StandardCharsets.UTF_8
+        )){
+
+            for (MIRequest request : requests){
+                writer.write(String.join(";",
+                        String.valueOf(ordinalNumber.incrementAndGet()),
+                        request.getModel(),
+                        request.getSerialNumber())
+                );
+                writer.newLine();
+            }
+            ordinalNumber.set(0);
+        }
+        return filePath;
+    }
+
+    private String generatePreProcessReportName() {
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")
+                        .withZone(ZoneId.systemDefault());
+        return "requests" + formatter.format(Instant.now()) + ".txt";
     }
 }
