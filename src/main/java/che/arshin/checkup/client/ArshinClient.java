@@ -55,7 +55,7 @@ public class ArshinClient {
             url = Objects.requireNonNull(HttpUrl.parse(baseUrl))
                     .newBuilder()
                     .addQueryParameter("fq", "mi.mitype:*" + arshinQuery.getMiType() + "*")
-                    //.addQueryParameter("fq", "mi.modification:*" +arshinQuery.getModification() + "*")
+                    .addQueryParameter("fq", "mi.modification:*" +arshinQuery.getModification() + "*")
                     .addQueryParameter("fq", "mi.number:" + arshinQuery.getSerialNumber())
                     .addQueryParameter("q", "*")
                     .addQueryParameter("fl",

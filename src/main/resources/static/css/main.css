@@ -38,6 +38,14 @@ th, td {
     text-align: center;
 }
 
+.pagination {
+    align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
 .text-align-left {
     text-align: left;
     margin-top: 2px;

@@ -17,7 +17,7 @@
 
 <div class="subtitle" id="result-unverified"></div>
 <div class="button-group">
-    <button type="button" onclick="checkSelectedMI()">
+    <button type="button" id="check-selected">
         Проверить выделенные
     </button>
 </div>
@@ -43,7 +43,15 @@
     </tbody>
 </table>
 
-<script src="js/checkup.js"></script>
+<div class="pagination">
+    <a href="#" id="page-backward"> << </a>
+    <p id = "page-number">-</p>
+    <p> of </p>
+    <p id = "total-page-number">-</p>
+    <a href="#" id="page-forward"> >> </a>
+</div>
+
+<script type="module" src="js/checkup.js"></script>
 </body>
 
 </html>

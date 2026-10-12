@@ -33,6 +33,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class MIService {
 
+    public static final DateTimeFormatter DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    .withZone(ZoneId.systemDefault());
+
     @Value("${app.settings.max-arshin-results-count}")
     private int maxArshinResultsCount;
     @Value("${app.settings.request-delay-ms}")

@@ -1,13 +1,22 @@
-async function getAllMIVerificationNeeded() {
+import { formatDate } from "./utils.js";
+let pageNumber = 0;
+let pageCount = 0;
+async function getAllMIVerificationNeeded(page = 0) {
 
     const result = document.getElementById("result-unverified");
     const tableBody = document.getElementById("mi-table-body");
+    pageNumber = document.getElementById("page-number");
+    pageCount =  document.getElementById("total-page-number");
 
+    tableBody.innerHTML = "";
     result.textContent = "Ожидайте...";
+    pageNumber.textContent = "";
+    pageCount.textContent = "";
 
     try {
-         const response = await fetch(`/api/mi/v-needed`, {
-             method: "GET"
+         const response = await fetch(`/api/mi/v-needed?page=${page}`, {
+             method: "GET",
+             cache: "no-store"
          });
 
          const data = await response.json();
@@ -17,9 +26,9 @@ async function getAllMIVerificationNeeded() {
              return;
          }
 
-         tableBody.innerHTML = "";
-
          result.textContent = `Найдено записей: ${data.totalElements}`;
+         pageNumber.textContent = data.page + 1;
+         pageCount.textContent = data.totalPages;
 
          data.miResponses.forEach(mi => {
              const row = document.createElement("tr");
@@ -44,11 +53,11 @@ async function getAllMIVerificationNeeded() {
              row.appendChild(numberCell);
 
              const verificationCell = document.createElement("td");
-             verificationCell.textContent = formatDate(mi.verificationDate) ?? "-";
+             verificationCell.textContent = formatDate(mi.verificationDate);
              row.appendChild(verificationCell);
 
              const validCell = document.createElement("td");
-             validCell.textContent = formatDate(mi.validDate) ?? "-";
+             validCell.textContent = formatDate(mi.validDate);
              row.appendChild(validCell);
 
              const organizationCell = document.createElement("td");
@@ -111,13 +120,37 @@ async function checkSelectedMI() {
     window.location.href = "/results.html";
 }
 
-function formatDate(dateString) {
-    if (!dateString) {
-        return "-";
+function nextPage(){
+    if(pageNumber < pageCount - 1){
+        getAllMIVerificationNeeded(pageNumber + 1)
     }
-return new Date(dateString).toLocaleDateString("ru-RU");
+}
+
+function previousPage(){
+    if(pageNumber > 0){
+        getAllMIVerificationNeeded(pageNumber - 1)
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("check-selected")
+        .addEventListener("click", checkSelectedMI);
+
+    document.getElementById("page-backward")
+        .addEventListener("click", (event) => {
+            event.preventDefault();
+            previousPage();
+        });
+
+
+    document.getElementById("page-forward")
+        .addEventListener("click", (event) =>{
+            event.preventDefault();
+            nextPage();
+        });
+
+});
+
+window.addEventListener("pageshow", () => {
     getAllMIVerificationNeeded();
 });

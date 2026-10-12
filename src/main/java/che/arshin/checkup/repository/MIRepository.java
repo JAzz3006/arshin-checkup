@@ -14,8 +14,9 @@ public interface MIRepository
     @Query("""
             SELECT mi
             FROM MeasuringInstrument mi
-            WHERE mi.validDate IS NULL
-            OR mi.validDate < :date
+            WHERE (mi.validDate IS NULL
+            OR mi.validDate < :date)
+            AND mi.autoCheckUp IS TRUE
             """)
     Page<MeasuringInstrument> findAllNeedsVerification(
             Pageable pageable,

@@ -1,3 +1,4 @@
+import { formatDate } from "./utils.js"
 function getReport(){
 
     const storedData = sessionStorage.getItem("verificationResults");
@@ -5,7 +6,7 @@ function getReport(){
     const stats = document.getElementById("stats");
 
     if (!storedData) {
-            result.textContent = "Нет данных о результатах проверки";
+            stats.textContent = "Нет данных о результатах проверки";
             return;
     }
 
@@ -31,10 +32,10 @@ function getReport(){
             msgCell.textContent = r.message ?? "-";
             row.appendChild(msgCell);
         const prevDateCell = document.createElement("td");
-            prevDateCell.textContent = r.previousValidDate ?? "-";
+            prevDateCell.textContent = formatDate(r.previousValidDate);
             row.appendChild(prevDateCell);
         const actDateCell = document.createElement("td");
-            actDateCell.textContent = r.arshinValidDate ?? "-";
+            actDateCell.textContent = formatDate(r.arshinValidDate);
             row.appendChild(actDateCell);
         const resultCountCell = document.createElement("td");
             resultCountCell.textContent = r.resultCount ?? "-";
