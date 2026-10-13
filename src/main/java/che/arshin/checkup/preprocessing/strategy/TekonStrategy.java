@@ -8,14 +8,14 @@ import java.util.regex.Pattern;
 @Component
 public class TekonStrategy implements PreProcessingStrategy{
 
-    private static final List<Pattern> METRAN_PATTERN = List.of(
+    private static final List<Pattern> TEKON_PATTERN = List.of(
             Pattern.compile("тэкон", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE)
     );
 
     @Override
     public boolean supports(MeasuringInstrument mi) {
         if (mi.getModel() == null || mi.getModel().isBlank()) return false;
-        return METRAN_PATTERN.stream()
+        return TEKON_PATTERN.stream()
                 .anyMatch(p -> p.matcher(mi.getModel()).find());
     }
 

@@ -65,4 +65,9 @@ function getReport(){
 
 document.addEventListener("DOMContentLoaded", () => {
     getReport();
+    document.getElementById("go-back").addEventListener("click", (event) => {
+        event.preventDefault();
+        const page = sessionStorage.getItem("returnPage") ?? "0";
+        window.location.href = `/checkup.html?page=${page}`;
+    });
 });

@@ -5,13 +5,13 @@ async function getAllMIVerificationNeeded(page = 0) {
 
     const result = document.getElementById("result-unverified");
     const tableBody = document.getElementById("mi-table-body");
-    pageNumber = document.getElementById("page-number");
-    pageCount =  document.getElementById("total-page-number");
+    const pageNumberElement = document.getElementById("page-number");
+    const pageCountElement = document.getElementById("total-page-number");
 
     tableBody.innerHTML = "";
     result.textContent = "Ожидайте...";
-    pageNumber.textContent = "";
-    pageCount.textContent = "";
+    pageNumberElement.textContent = "";
+    pageCountElement.textContent = "";
 
     try {
          const response = await fetch(`/api/mi/v-needed?page=${page}`, {
@@ -27,8 +27,12 @@ async function getAllMIVerificationNeeded(page = 0) {
          }
 
          result.textContent = `Найдено записей: ${data.totalElements}`;
-         pageNumber.textContent = data.page + 1;
-         pageCount.textContent = data.totalPages;
+         pageNumber = data.page;
+         pageCount = data.totalPages;
+         pageNumberElement.textContent = pageCount === 0 ? 0 : pageNumber + 1;
+         pageCountElement.textContent = pageCount;
+
+         updatePaginationButtons()
 
          data.miResponses.forEach(mi => {
              const row = document.createElement("tr");
@@ -114,7 +118,11 @@ async function checkSelectedMI() {
 
     sessionStorage.setItem(
         "verificationResults",
-        JSON.stringify(data)
+        JSON.stringify(data),
+    );
+    sessionStorage.setItem(
+            "returnPage",
+            pageNumber
     );
 
     window.location.href = "/results.html";
@@ -132,13 +140,23 @@ function previousPage(){
     }
 }
 
+function updatePaginationButtons() {
+    const backward = document.getElementById("page-backward");
+    const forward = document.getElementById("page-forward");
+
+    backward.classList.toggle("disabled", pageNumber === 0);
+    forward.classList.toggle("disabled", pageNumber >= pageCount - 1);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+    //console.log("DOMContentLoaded сработал");
     document.getElementById("check-selected")
         .addEventListener("click", checkSelectedMI);
 
     document.getElementById("page-backward")
         .addEventListener("click", (event) => {
             event.preventDefault();
+            if (event.currentTarget.classList.contains("disabled")) return;
             previousPage();
         });
 
@@ -146,11 +164,15 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("page-forward")
         .addEventListener("click", (event) =>{
             event.preventDefault();
+            if (event.currentTarget.classList.contains("disabled")) return;
             nextPage();
         });
-
 });
 
 window.addEventListener("pageshow", () => {
-    getAllMIVerificationNeeded();
+    const params = new URLSearchParams(window.location.search);
+    const page = Number(params.get("page") ?? 0);
+    getAllMIVerificationNeeded(
+        Number.isInteger(page) && page >=0 ? page : 0
+    );
 });

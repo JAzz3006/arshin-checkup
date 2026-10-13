@@ -46,6 +46,14 @@ th, td {
     gap: 20px;
 }
 
+.pagination a.disabled {
+    color: #999;
+    opacity: 0.4;
+    cursor: default;
+    pointer-events: none;
+    text-decoration: none;
+}
+
 .text-align-left {
     text-align: left;
     margin-top: 2px;
