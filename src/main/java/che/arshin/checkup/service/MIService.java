@@ -145,6 +145,7 @@ public class MIService {
                     .previousValidDate(previousValidDate)
                     .resultCount(resultCount)
                     .applicability(mi.getApplicability())
+                    .options(docs)
                     .build();
         }
 

@@ -37,9 +37,23 @@ function getReport(){
         const actDateCell = document.createElement("td");
             actDateCell.textContent = formatDate(r.arshinValidDate);
             row.appendChild(actDateCell);
+
         const resultCountCell = document.createElement("td");
-            resultCountCell.textContent = r.resultCount ?? "-";
+        const resultCountButton = document.createElement("button");
+            resultCountButton.type = "button";
+            resultCountButton.textContent = r.resultCount ?? "-";
+            resultCountButton.disabled = !r.options?.length;
+            resultCountCell.appendChild(resultCountButton);
             row.appendChild(resultCountCell);
+        const optionsRow = document.createElement("tr");
+            optionsRow.hidden = true;
+            const optionsCell = document.createElement("td");
+            optionsCell.colSpan = 12;
+            optionsRow.appendChild(optionsCell);
+            resultCountButton.addEventListener("click", () =>{
+                optionsRow.hidden = !optionsRow.hidden
+            });
+
         const organizationCell = document.createElement("td");
             organizationCell.textContent = r.organization ?? "-";
             row.appendChild(organizationCell);
@@ -53,6 +67,7 @@ function getReport(){
             addressCell.textContent = r.address ?? "-";
             row.appendChild(addressCell);
         tableBody.appendChild(row);
+        tableBody.appendChild(optionsRow);
     });
 
     let summaryText = `Проверено в ГИС Аршин ${data.results.length} СИ, из них:\n`;
@@ -70,4 +85,5 @@ document.addEventListener("DOMContentLoaded", () => {
         const page = sessionStorage.getItem("returnPage") ?? "0";
         window.location.href = `/checkup.html?page=${page}`;
     });
+
 });
