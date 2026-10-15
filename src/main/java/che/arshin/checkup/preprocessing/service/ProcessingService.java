@@ -77,7 +77,8 @@ public class ProcessingService {
                     mi.getModel().isBlank() ||
                     mi.getSerialNumber() == null ||
                     mi.getSerialNumber().isBlank()){
-                MIRequest request = new MIRequest(null,null,null,null,null,false, null);
+                MIRequest request = new MIRequest();
+                request.setAutoCheckUp(false);
                 miService.updateMI(mi.getId(), miMapper.from(request));
                 results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.NOT_AUTO_CHECKABLE, "Отсутствует модель или серийный номер"));
                 continue;
@@ -85,7 +86,8 @@ public class ProcessingService {
 
             if (mi.getModel().toLowerCase(Locale.ROOT).contains("акт") ||
                     mi.getModel().toLowerCase(Locale.ROOT).contains("нет корректора")){
-                MIRequest request = new MIRequest(null,null,null,null,null,false, null);
+                MIRequest request = new MIRequest();
+                request.setAutoCheckUp(false);
                 miService.updateMI(mi.getId(), miMapper.from(request));
                 results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.NOT_MEASURING_INSTRUMENT, "Не является СИ"));
                 continue;

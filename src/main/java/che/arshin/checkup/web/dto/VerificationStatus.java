@@ -2,6 +2,7 @@ package che.arshin.checkup.web.dto;
 
 public enum VerificationStatus {
     UPDATED,
+    MANUALLY_UPDATED,
     NOT_UPDATED,
     NO_AUTO_CHECK,
     NOT_FOUND,
@@ -9,5 +10,4 @@ public enum VerificationStatus {
     NO_RESULT,
     UNUSABLE,
     ERROR
-
 }

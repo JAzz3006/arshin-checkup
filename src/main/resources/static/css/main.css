@@ -77,3 +77,116 @@ th, td {
 .button-group button {
     width: 180px;
 }
+
+.options-container {
+    padding: 15px 25px;
+    background-color: #fafafa;
+    text-align: left;
+}
+
+.options-container h4 {
+    margin: 0 0 15px;
+}
+
+.verification-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+.verification-option input[type="radio"] {
+    margin-top: 4px;
+}
+
+.verification-option p {
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: #777;
+}
+
+.result-count-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 5px 13px;
+    border: 1px solid #d9d9d9;
+    border-radius: 20px;
+
+    background-color: #fff;
+    color: #555;
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+.result-count-button:hover:not(:disabled) {
+    background-color: #f5f5f5;
+}
+
+.result-count-button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.result-count-arrow {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.verification-action-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.verification-date-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.verification-date-label {
+    font-size: 12px;
+    color: #888;
+}
+
+.verification-selected-date {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+}
+
+.apply-verification-button {
+    padding: 9px 20px;
+    border: none;
+    border-radius: 25px;
+
+    background-color: #111;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.apply-verification-button:hover:not(:disabled) {
+    background-color: #333;
+}
+
+.apply-verification-button:disabled {
+    background-color: #999;
+    opacity: 0.4;
+    cursor: default;
+}
+
+[hidden] {
+    display: none !important;
+}
