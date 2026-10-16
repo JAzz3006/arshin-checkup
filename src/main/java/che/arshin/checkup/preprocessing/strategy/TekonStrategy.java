@@ -23,6 +23,10 @@ public class TekonStrategy implements PreProcessingStrategy{
     public MIRequest process(MeasuringInstrument mi) {
         MIRequest request = new MIRequest();
         request.setMiType("тэкон");
+        if (mi.getSerialNumber().matches("^[0?]/.*")){
+            String serialNumber = mi.getSerialNumber().substring(2);
+            request.setSerialNumber(serialNumber);
+        }
         return request;
     }
 }
