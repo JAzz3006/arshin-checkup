@@ -39,6 +39,8 @@ public class MIService {
 
     @Value("${app.settings.max-arshin-results-count}")
     private int maxArshinResultsCount;
+    @Value("${app.pagination.default-page-size}")
+    private int badStrategy;
     @Value("${app.settings.request-delay-ms}")
     private int requestDelay;
     @Value("${app.reports.directory}")
@@ -75,7 +77,7 @@ public class MIService {
 
     public MeasuringInstrument createMI(MeasuringInstrument mi){
         mi.setAutoCheckUp(true);
-        //TODO подумать над автоматическим запросом к ГИС при создании СИ
+        mi.setAutoPreProcessable(true);
         return miRepository.save(mi);
     }
 
@@ -132,7 +134,7 @@ public class MIService {
 
         ArshinDocument document = docs.getFirst(); // Arshin response is sorted by verification_date desc, so the first document contains the latest verification
 
-        if (resultCount > maxArshinResultsCount){
+        if (resultCount > maxArshinResultsCount && resultCount < badStrategy){
             return VerificationResult.builder()
                     .id(id)
                     .model(mi.getModel())
@@ -146,6 +148,23 @@ public class MIService {
                     .resultCount(resultCount)
                     .applicability(mi.getApplicability())
                     .options(docs)
+                    .build();
+        }
+
+        if (resultCount > badStrategy){
+            return VerificationResult.builder()
+                    .id(id)
+                    .model(mi.getModel())
+                    .serialNumber(mi.getSerialNumber())
+                    .status(VerificationStatus.BAD_STRATEGY)
+                    .message(
+                            String.format("Для данного СИ требуется разработка стратегии поиска - ГИС Аршин вернул более '%d' результатов",
+                                    badStrategy)
+                    )
+                    .previousValidDate(previousValidDate)
+                    .resultCount(resultCount)
+                    .applicability(mi.getApplicability())
+                    //.options(docs)
                     .build();
         }
 

@@ -10,4 +10,5 @@ public class ArshinQuery {
     private String miType;
     private String serialNumber;
     private String modification;
+    private String miSearchNumber;
 }

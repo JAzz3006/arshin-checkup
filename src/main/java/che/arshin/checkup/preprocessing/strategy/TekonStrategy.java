@@ -25,7 +25,7 @@ public class TekonStrategy implements PreProcessingStrategy{
         request.setMiType("тэкон");
         if (mi.getSerialNumber().matches("^[0?]/.*")){
             String serialNumber = mi.getSerialNumber().substring(2);
-            request.setSerialNumber(serialNumber);
+            request.setMiSearchNumber(serialNumber);
         }
         return request;
     }

@@ -24,7 +24,7 @@ public class MetranStrategy implements PreProcessingStrategy{
     public MIRequest process(MeasuringInstrument mi) {
         if (mi == null) throw new NoMeasuringInstrumentException("СИ не передано");
         MIRequest request = new MIRequest();
-        request.setMiType("метран");
+        request.setMiType("*метран*");
         String model = mi.getModel();
         int start = model.indexOf('-') + 1;
 
@@ -35,7 +35,7 @@ public class MetranStrategy implements PreProcessingStrategy{
         String modification = model.substring(start, end);
 
         if (!modification.equals("")){
-            request.setModification(modification);
+            request.setModification("*" + modification + "*");
         }else request.setModification(null);
 
         return request;

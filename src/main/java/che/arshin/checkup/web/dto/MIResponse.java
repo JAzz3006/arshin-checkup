@@ -17,9 +17,11 @@ public class MIResponse {
     private Instant verificationDate;
     private Instant validDate;
     private String miType;
+    private String miSearchNumber;
     private String modification;
     private String miTitle;
     private Boolean autoCheckUp;
     private Integer resultsCount;
     private Boolean applicability;
+    private Boolean autoPreProcessable;
 }

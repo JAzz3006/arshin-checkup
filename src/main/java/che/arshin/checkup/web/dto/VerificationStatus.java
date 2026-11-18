@@ -9,5 +9,6 @@ public enum VerificationStatus {
     MULTIPLE_RESULTS,
     NO_RESULT,
     UNUSABLE,
-    ERROR
+    ERROR,
+    BAD_STRATEGY
 }

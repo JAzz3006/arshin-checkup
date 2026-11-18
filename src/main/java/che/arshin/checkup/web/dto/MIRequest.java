@@ -12,10 +12,12 @@ public class MIRequest {
     private String model;
     private String serialNumber;
     private String miType;
+    private String  miSearchNumber;
     private String modification;
     private String miTitle;
     private Boolean autoCheckUp;
     private Boolean applicability;
+    private Boolean autoPreProcessable;
     private Instant validDate;
     private Instant verificationDate;
 }

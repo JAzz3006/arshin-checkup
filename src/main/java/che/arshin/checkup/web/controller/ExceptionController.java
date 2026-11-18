@@ -60,6 +60,14 @@ public class ExceptionController {
                 .body(new ErrorResponse(e.getMessage()));
     }
 
+    @ExceptionHandler(PreprocessForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handlePreprocessForbiddenException(PreprocessForbiddenException e){
+        log.warn(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(e.getMessage()));
+    }
+
     @ExceptionHandler(ReportWritingException.class)
     public ResponseEntity<ErrorResponse> handleReportWritingException(
             ReportWritingException e

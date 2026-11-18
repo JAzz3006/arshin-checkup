@@ -34,40 +34,39 @@ public class ArshinClient {
     }
 
     private HttpUrl buildUrl(ArshinQuery arshinQuery) {
-        HttpUrl url = null;
-        if (arshinQuery.getModification() == null || arshinQuery.getModification().isBlank()){
-            url = Objects.requireNonNull(HttpUrl.parse(baseUrl))
-                    .newBuilder()
-                    .addQueryParameter("fq", "mi.mitype:*" + arshinQuery.getMiType() + "*")
-                    //.addQueryParameter("fq", "mi.modification:*" +arshinQuery.getModification() + "*")
-                    .addQueryParameter("fq", "mi.number:" + arshinQuery.getSerialNumber())
-                    .addQueryParameter("q", "*")
-                    .addQueryParameter("fl",
-                            "vri_id,org_title,mi.mitnumber,mi.mititle," +
-                                    "mi.mitype,mi.modification,mi.number," +
-                                    "verification_date,valid_date,applicability," +
-                                    "result_docnum,sticker_num")
-                    .addQueryParameter("sort", "verification_date desc,org_title asc") //it is crucial for further logic to maintain this sort type - the latest validation must come first
-                    .addQueryParameter("rows", "20")
-                    .addQueryParameter("start", "0")
-                    .build();
-        }else{
-            url = Objects.requireNonNull(HttpUrl.parse(baseUrl))
-                    .newBuilder()
-                    .addQueryParameter("fq", "mi.mitype:*" + arshinQuery.getMiType() + "*")
-                    .addQueryParameter("fq", "mi.modification:*" +arshinQuery.getModification() + "*")
-                    .addQueryParameter("fq", "mi.number:" + arshinQuery.getSerialNumber())
-                    .addQueryParameter("q", "*")
-                    .addQueryParameter("fl",
-                            "vri_id,org_title,mi.mitnumber,mi.mititle," +
-                                    "mi.mitype,mi.modification,mi.number," +
-                                    "verification_date,valid_date,applicability," +
-                                    "result_docnum,sticker_num")
-                    .addQueryParameter("sort", "verification_date desc,org_title asc") //it is crucial for further logic to maintain this sort type - the latest validation must come first
-                    .addQueryParameter("rows", "20")
-                    .addQueryParameter("start", "0")
-                    .build();
+        String searchNumber = arshinQuery.getMiSearchNumber() != null &&
+                !arshinQuery.getMiSearchNumber().isBlank() ?
+                arshinQuery.getMiSearchNumber() : arshinQuery.getSerialNumber();
+
+        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(baseUrl))
+                .newBuilder()
+                //.addQueryParameter("fq", "mi.mitype:*" + arshinQuery.getMiType() + "*")
+                //.addQueryParameter("fq", "mi.modification:*" +arshinQuery.getModification() + "*")
+                .addQueryParameter("fq", "mi.number:" + searchNumber)
+                .addQueryParameter("q", "*")
+                .addQueryParameter("fl",
+                        "vri_id,org_title,mi.mitnumber,mi.mititle," +
+                                "mi.mitype,mi.modification,mi.number," +
+                                "verification_date,valid_date,applicability," +
+                                "result_docnum,sticker_num")
+                .addQueryParameter("sort", "verification_date desc,org_title asc") //it is crucial for further logic to maintain this sort type - the latest validation must come first
+                .addQueryParameter("rows", "20")
+                .addQueryParameter("start", "0");
+
+        if (arshinQuery.getModification() != null && !arshinQuery.getModification().isBlank()){
+            builder.addQueryParameter(
+                    "fq",
+                    "mi.modification:" + arshinQuery.getModification()
+            );
         }
+        if (arshinQuery.getMiType() != null && !arshinQuery.getMiType().isBlank()){
+            builder.addQueryParameter(
+                    "fq",
+                    "mi.mitype:" + arshinQuery.getMiType()
+            );
+        }
+
+        HttpUrl url = builder.build();
         log.info("Запрос: {}", url);
         return url;
     }
@@ -75,7 +74,7 @@ public class ArshinClient {
     private <T> T processResponse (Request request, TypeReference<T> typeReference) {
         try(Response response = httpClient.newCall(request).execute()){
             if (!response.isSuccessful()){
-                throw new BadArshinResponseException("Unexpected response code " + response);
+                throw new BadArshinResponseException("Неожиданный код ответа " + response);
             }
 
             ResponseBody responseBody = response.body();
@@ -84,10 +83,11 @@ public class ArshinClient {
                 String stringBody = responseBody.string();
                 return objectMapper.readValue(stringBody, typeReference);
             }else {
-                throw new BadArshinResponseException("ResponseBody is empty!");
+                throw new BadArshinResponseException("Ответ ГИС Аршин пустой");
             }
         }catch (IOException e){
-            throw new BadArshinResponseException("Error processing Arshin response");
+            log.error("Ошибка обращения к ГИС Аршин", e);
+            throw new BadArshinResponseException("Ошибка обработки ответа ГИС Аршин");
         }
     }
 }

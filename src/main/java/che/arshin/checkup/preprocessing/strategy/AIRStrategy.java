@@ -2,7 +2,6 @@ package che.arshin.checkup.preprocessing.strategy;
 import che.arshin.checkup.entity.MeasuringInstrument;
 import che.arshin.checkup.web.dto.MIRequest;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -23,7 +22,7 @@ public class AIRStrategy implements PreProcessingStrategy {
     @Override
     public MIRequest process(MeasuringInstrument mi) {
         MIRequest request = new MIRequest();
-        request.setMiType("АИР");
+        request.setMiType("*АИР*");
         return request;
     }
 }

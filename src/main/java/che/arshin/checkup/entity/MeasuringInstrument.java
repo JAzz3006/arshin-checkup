@@ -29,9 +29,11 @@ public class MeasuringInstrument {
     @Column(name = "valid_date")
     private Instant validDate;
 
-    //TODO подумать надо ли сюда статус
     @Column(name = "mi_mitype")
     private String miType;
+
+    @Column(name = "mi_search_number")
+    private String miSearchNumber;
 
     @Column(name = "mi_modification")
     private String modification;
@@ -47,4 +49,7 @@ public class MeasuringInstrument {
 
     @Column(name = "applicability")
     private Boolean applicability;
+
+    @Column(name = "auto_preprocessable", nullable = false)
+    private Boolean autoPreProcessable = true;
 }

@@ -14,11 +14,11 @@ public interface MIMapper {
 
     MeasuringInstrument from(MIRequest request);
 
-    ArshinQuery arshinQueryFrom(MeasuringInstrument mi);
-
     MIResponse from(MeasuringInstrument mi);
 
     List<MIResponse> from(List<MeasuringInstrument> instruments);
+
+    ArshinQuery arshinQueryFrom(MeasuringInstrument mi);
 
     default MIListResponse from(Page<MeasuringInstrument> instrumentPage){
         return MIListResponse.builder()

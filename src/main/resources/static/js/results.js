@@ -174,10 +174,23 @@ function createOptionsList(options, instrumentId){
                     validDate: optionToApply["valid_date"],
                     verificationDate: optionToApply["verification_date"]
                 })
-            })
+                })
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
+
+            const data = JSON.parse(sessionStorage.getItem("verificationResults"));
+            const result = data.results.find(r => r.id === instrumentId);
+            if (result) {
+                result.status = "MANUALLY_UPDATED";
+                data.summary = {};
+                data.results.forEach(r => {
+                    data.summary[r.status] = (data.summary[r.status] ?? 0) + 1;
+                });
+                sessionStorage.setItem("verificationResults", JSON.stringify(data));
+                getReport();
+            }
+
             selectedDate.textContent = `Дата действительности СИ ${optionToApply["mi.mitype"]} · № ${optionToApply["mi.number"]} обновлена`;
         }catch(error){
             console.error(error);

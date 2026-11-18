@@ -1,6 +1,7 @@
 package che.arshin.checkup.preprocessing.service;
 import che.arshin.checkup.entity.MeasuringInstrument;
 import che.arshin.checkup.exception.MultipleMatchedStrategiesException;
+import che.arshin.checkup.exception.PreprocessForbiddenException;
 import che.arshin.checkup.exception.ReportWritingException;
 import che.arshin.checkup.exception.StrategyNotFoundException;
 import che.arshin.checkup.mapper.MIMapper;
@@ -46,6 +47,9 @@ public class ProcessingService {
     }
 
     public void preProcessOne(MeasuringInstrument mi){
+        if (Boolean.FALSE.equals(mi.getAutoPreProcessable())){
+            throw new PreprocessForbiddenException("Для СИ id = " + mi.getId() + " установлены нестандартные критерии поиска");
+        }
          List<PreProcessingStrategy> matchedStrategies = strategies.stream()
                 .filter(strategy -> strategy.supports(mi))
                 .toList();
@@ -105,6 +109,8 @@ public class ProcessingService {
                 results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.NO_STRATEGY_FOUND, e.getMessage()));
             } catch (MultipleMatchedStrategiesException e) {
                 results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.MULTIPLE_STRATEGIES_FOUND, e.getMessage()));
+            }catch (PreprocessForbiddenException e){
+                results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.NOT_PRE_PROCESSABLE, e.getMessage()));
             } catch (Exception e) {
                 log.error("Ошибка препроцессинга СИ id={}", mi.getId(), e);
                 results.add(buildResult(mi.getId(), mi.getModel(), mi.getSerialNumber(), PreProcessStatus.ERROR, e.getMessage()));
